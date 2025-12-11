@@ -12,7 +12,7 @@ const quizData = [
   {
     "id": 2,
     "part": 1,
-    "question": "他常常去博物馆。",
+    "question": "他常常去博物館。",
     "image": "images/2.png",
     "options": ["(A)", "(B)", "(C)"],
     "answer": "B",
