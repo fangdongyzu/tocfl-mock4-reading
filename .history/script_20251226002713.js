@@ -196,7 +196,7 @@ function createStandardQuestion(question) {
 function createPart4Question(question) {
     return `
         <div class="question-item">
-            <div class="question-text">${question.id}.</div>
+            <div class="question-text">${question.id}. (${question.id})</div>
             <div class="options">
                 ${question.options.map((option, index) => {
                     const optionLetter = String.fromCharCode(65 + index);

@@ -192,25 +192,6 @@ function createStandardQuestion(question) {
     `;
 }
 
-// Added missing helper for Part 4 to prevent render errors
-function createPart4Question(question) {
-    return `
-        <div class="question-item">
-            <div class="question-text">${question.id}.</div>
-            <div class="options">
-                ${question.options.map((option, index) => {
-                    const optionLetter = String.fromCharCode(65 + index);
-                    return `
-                        <div class="option" data-question-id="${question.id}" data-option="${optionLetter}">
-                            <span class="option-letter">${optionLetter}</span>
-                            <span class="option-text">${option}</span>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-        </div>
-    `;
-}
 
 function updateNavigationButtons() {
     const isFirstPart = currentPartIndex === 0;
