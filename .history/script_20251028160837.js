@@ -50,34 +50,34 @@ function updateStartButton() {
 function startQuiz() {
     const selectedCheckboxes = Array.from(document.querySelectorAll('.part-checkbox input:checked'));
     currentParts = selectedCheckboxes.map(cb => parseInt(cb.dataset.part)).sort();
-
+    
     if (currentParts.length === 0) {
         alert('Please select at least one part to start the quiz!');
         return;
     }
-
+    
     currentPartIndex = 0;
     userAnswers = {};
-
+    
     // Organize questions by part
     questionsByPart = {};
     currentParts.forEach(part => {
         questionsByPart[part] = quizData.filter(q => q.part === part).sort((a, b) => a.id - b.id);
     });
-
+    
     partSelection.classList.add('hidden');
     quizContainer.classList.remove('hidden');
     resultsContainer.classList.add('hidden');
-
+    
     showCurrentPart();
 }
 
 function showCurrentPart() {
     const currentPart = currentParts[currentPartIndex];
     const currentPartQuestions = questionsByPart[currentPart];
-
+    
     partTitle.textContent = `${partInfo[currentPart].name}`;
-
+    
     // Show all selected parts as tags with current part highlighted
     selectedPartsElement.innerHTML = '';
     currentParts.forEach((part, index) => {
@@ -86,7 +86,7 @@ function showCurrentPart() {
         partTag.textContent = `Part ${part}`;
         selectedPartsElement.appendChild(partTag);
     });
-
+    
     // Show all questions for current part
     showAllQuestions(currentPartQuestions);
     updateNavigationButtons();
@@ -94,68 +94,36 @@ function showCurrentPart() {
 
 function showAllQuestions(questions) {
     let questionsHTML = '';
-
-    // Define the paragraph texts
-    const text36_40 = "“上個星期，我的同學小玲在 ___（36）___ 。她說現在工作越來越難找，她 ___（37）___ ，花了半年多的時間， ___（38）___ 。現在 ___（39）___ ，所以不想結婚、生孩子。 ___（40）___ 想一個人生活，或是跟爸媽一起住。”";
-
-    const text41_45 = "“小孩最喜歡玩了，一個小遊戲，小孩就可以 ___（41）___ 、很愉快。但是，大人不這樣認為，因為小孩玩的遊戲常常讓大人 ___（42）___ 。還有，小孩玩一個遊戲，總是玩一會兒就不玩了，大人要 ___（43）___ 給小孩玩，這讓大人覺得和小孩一起玩遊戲，真是 ___（44）___。很多大人不明白遊戲對小孩的重要。小孩玩什麼？怎麼玩？有沒有人 ___（45） ___？這些都很重要。因為小孩就是從遊戲中認識這個世界和學到禮貌。”";
-
+    
     questions.forEach(question => {
-        // 1. INJECT SHARED CONTENT (CONTEXT)
-
-        // Part 3: Shared Image for 31-35 (Appears once above Q31)
-        if (question.id === 31) {
-            questionsHTML += `
-                <div class="context-container">
-                    <img src="images/31-35.png" alt="Reference for questions 31-35">
-                </div>`;
-        }
-
-        // Part 4: Paragraph for 36-40 (Appears once above Q36)
-        if (question.id === 36) {
-            questionsHTML += `
-                <div class="context-container">
-                    <div class="reading-passage">${text36_40}</div>
-                </div>`;
-        }
-
-        // Part 4: Paragraph for 41-45 (Appears once above Q41)
-        if (question.id === 41) {
-            questionsHTML += `
-                <div class="context-container">
-                    <div class="reading-passage">${text41_45}</div>
-                </div>`;
-        }
-
-        // 2. RENDER THE QUESTION CARD
         if (question.part === 4) {
             questionsHTML += createPart4Question(question);
         } else {
             questionsHTML += createStandardQuestion(question);
         }
     });
-
+    
     questionContainer.innerHTML = questionsHTML;
-
+    
     // Add event listeners to all options
     document.querySelectorAll('.option').forEach(option => {
         option.addEventListener('click', (e) => {
             const questionId = parseInt(e.currentTarget.dataset.questionId);
             const selectedOption = e.currentTarget.dataset.option;
-
+            
             // Remove selected class from all options for this question
             document.querySelectorAll(`.option[data-question-id="${questionId}"]`).forEach(opt => {
                 opt.classList.remove('selected');
             });
-
+            
             // Add selected class to clicked option
             e.currentTarget.classList.add('selected');
-
+            
             // Store user answer
             userAnswers[questionId] = selectedOption;
         });
     });
-
+    
     // Restore previous selections
     questions.forEach(question => {
         if (userAnswers[question.id]) {
@@ -168,46 +136,43 @@ function showAllQuestions(questions) {
 }
 
 function createStandardQuestion(question) {
-    // Only show the image inside the card if it exists AND it is NOT Part 3.
-    // Part 3 images are now shown in the group header, so we hide them here.
-    const showImageInCard = question.image && question.part !== 3;
-
     return `
         <div class="question-item">
             <div class="question-text">${question.id}. ${question.question}</div>
-            ${showImageInCard ? `
+            ${question.image ? `
                 <div class="question-image">
                     <img src="${question.image}" alt="Question ${question.id} Image">
                 </div>
             ` : ''}
             <div class="options">
                 ${question.options.map((option, index) => {
-        const optionLetter = String.fromCharCode(65 + index);
-        return `
+                    const optionLetter = String.fromCharCode(65 + index);
+                    return `
                         <div class="option" data-question-id="${question.id}" data-option="${optionLetter}">
                             <span class="option-letter">${optionLetter}</span>
                             <span class="option-text">${option}</span>
                         </div>
                     `;
-    }).join('')}
+                }).join('')}
             </div>
         </div>
     `;
 }
+
 function createPart4Question(question) {
     return `
         <div class="question-item">
             <div class="question-text">${question.id}. ${question.question}</div>
             <div class="options">
                 ${question.options.map((option, index) => {
-        const optionLetter = String.fromCharCode(65 + index);
-        return `
+                    const optionLetter = String.fromCharCode(65 + index);
+                    return `
                         <div class="option" data-question-id="${question.id}" data-option="${optionLetter}">
                             <span class="option-letter">${optionLetter}</span>
                             <span class="option-text">${option}</span>
                         </div>
                     `;
-    }).join('')}
+                }).join('')}
             </div>
         </div>
     `;
@@ -216,9 +181,9 @@ function createPart4Question(question) {
 function updateNavigationButtons() {
     const isFirstPart = currentPartIndex === 0;
     const isLastPart = currentPartIndex === currentParts.length - 1;
-
+    
     prevBtn.style.display = isFirstPart ? 'none' : 'block';
-
+    
     if (isLastPart) {
         nextBtn.style.display = 'none';
         submitBtn.style.display = 'block';
@@ -226,7 +191,7 @@ function updateNavigationButtons() {
         nextBtn.style.display = 'block';
         submitBtn.style.display = 'none';
     }
-
+    
     // Update button texts
     if (currentParts.length > 1) {
         prevBtn.textContent = 'Previous Part';
@@ -255,14 +220,14 @@ function showNextPart() {
 function submitQuiz() {
     let totalScore = 0;
     let totalQuestions = 0;
-
+    
     // Calculate scores by part
     const partScores = {};
     currentParts.forEach(part => {
         const partQuestions = questionsByPart[part];
         const partTotal = partQuestions.length;
         let partScore = 0;
-
+        
         partQuestions.forEach(question => {
             totalQuestions++;
             if (userAnswers[question.id] === question.answer) {
@@ -270,25 +235,25 @@ function submitQuiz() {
                 totalScore++;
             }
         });
-
+        
         partScores[part] = {
             score: partScore,
             total: partTotal,
             percentage: Math.round((partScore / partTotal) * 100)
         };
     });
-
+    
     // Display overall results
     scoreElement.textContent = totalScore;
     totalElement.textContent = totalQuestions;
     percentageElement.textContent = Math.round((totalScore / totalQuestions) * 100);
-
+    
     // Show part breakdown
     showPartBreakdown(partScores);
-
+    
     // Show detailed results
     showDetailedResults();
-
+    
     // Switch to results view
     quizContainer.classList.add('hidden');
     resultsContainer.classList.remove('hidden');
@@ -296,36 +261,36 @@ function submitQuiz() {
 
 function showPartBreakdown(partScores) {
     partBreakdownElement.innerHTML = '<h3>Performance Analysis by Part</h3>';
-
+    
     currentParts.forEach(part => {
         const scoreInfo = partScores[part];
         const breakdownItem = document.createElement('div');
         breakdownItem.className = 'breakdown-item';
-
+        
         breakdownItem.innerHTML = `
             <h4>${partInfo[part].name}</h4>
             <div>Score: ${scoreInfo.score} / ${scoreInfo.total}</div>
             <div>Accuracy: ${scoreInfo.percentage}%</div>
         `;
-
+        
         partBreakdownElement.appendChild(breakdownItem);
     });
 }
 
 function showDetailedResults() {
     resultsDetails.innerHTML = '<h3>Detailed Answer Results</h3>';
-
+    
     currentParts.forEach(part => {
         const partQuestions = questionsByPart[part];
-
+        
         partQuestions.forEach(question => {
             const userAnswer = userAnswers[question.id];
             const isCorrect = userAnswer === question.answer;
             const isAnswered = userAnswer !== undefined;
-
+            
             const resultItem = document.createElement('div');
             resultItem.className = `result-item ${isCorrect ? 'correct' : isAnswered ? 'incorrect' : 'unanswered'}`;
-
+            
             let statusText = '';
             if (isCorrect) {
                 statusText = '✓ Correct';
@@ -334,15 +299,15 @@ function showDetailedResults() {
             } else {
                 statusText = '○ Not Answered';
             }
-
+            
             const userAnswerText = userAnswer ? `Your Answer: ${userAnswer}` : 'Not Answered';
             const correctAnswerText = `Correct Answer: ${question.answer}`;
-
+            
             resultItem.innerHTML = `
                 <div class="result-question">${partInfo[part].name} - Question ${question.id}: ${statusText}</div>
                 <div class="result-answer">${userAnswerText} | ${correctAnswerText}</div>
             `;
-
+            
             resultsDetails.appendChild(resultItem);
         });
     });
@@ -351,13 +316,13 @@ function showDetailedResults() {
 function restartQuiz() {
     resultsContainer.classList.add('hidden');
     partSelection.classList.remove('hidden');
-
+    
     // Reset checkboxes
     document.querySelectorAll('.part-checkbox input').forEach(checkbox => {
         checkbox.checked = false;
     });
     updateStartButton();
-
+    
     currentParts = [];
     currentPartIndex = 0;
     userAnswers = {};
